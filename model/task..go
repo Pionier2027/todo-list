@@ -11,9 +11,31 @@ type Task struct {
 	Finished bool
 }
 
-// dbからtask一覧を取得する関数
+// dbからtask一覧を取得
 func GetTasks() ([]Task, error) {
 	var tasks []Task
+
 	err := db.Find(&tasks).Error
+
 	return tasks, err
+}
+
+// dbにtaskを追加
+func AddTask(name string) (*Task, error) {
+
+	id, err := uuid.NewUUID()
+	if err != nil {
+		return nil, err
+	}
+
+	task := Task{
+		ID:       id,
+		Name:     name,
+		Finished: false,
+	}
+
+	// taskをDBに追加
+	err = db.Create(&task).Error
+
+	return &task, err
 }
