@@ -39,3 +39,10 @@ func AddTask(name string) (*Task, error) {
 
 	return &task, err
 }
+
+// dbのtaskを更新
+func ChangeFinishedTask(taskID uuid.UUID) error {
+
+	err := db.Model(&Task{}).Where("id = ?", taskID).Update("finished", true).Error
+	return err
+}
