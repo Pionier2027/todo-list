@@ -22,6 +22,7 @@ func SetRouter(e *echo.Echo) error {
 	e.GET("/api/tasks", GetTasksHandler)
 	e.POST("/api/tasks", AddTaskHandler)
 	e.PUT("/api/tasks/:taskID", ChangeFinishedTaskHandler)
+	e.DELETE("/api/tasks/:taskID", DeleteTaskHandler)
 
 	err := e.Start(":8000")
 	return err
