@@ -1,0 +1,124 @@
+openapi: "3.0.0"
+
+info:
+  title: "TODOリスト API"
+  license:
+    name: "MIT License"
+    url: "https://opensource.org/licenses/MIT"
+  version: "1.0.0"
+
+servers:
+  - url: "http://localhost:{port}"
+    description: "ローカルの開発環境"
+    variables:
+      port:
+        enum: ["4000"]
+        default: "4000"
+
+paths:
+  "/api/completes/tasks":
+    get:
+      summary: "完了しているタスクを取得します"
+      description: "完了しているタスクを取得します。"
+      deprecated: false
+      responses:
+        "200":
+          description: "完了しているタスクの取得に成功しました。"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+  "/api/incompletes/tasks":
+    get:
+      summary: "完了していないタスクを取得します"
+      description: "完了していないタスクを取得します。"
+      deprecated: false
+      responses:
+        "200":
+          description: "完了していないタスクの取得に成功しました。"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+  "/api/tasks/{task_id}":
+    post:
+      summary: "タスクの追加をします"
+      description: "タスクの追加をします。task_idは自動で割り振られます。"
+      deprecated: false
+      parameters:
+        - name: task_id
+          in: path
+          description: 追加対象のタスクID
+          required: true
+          schema:
+            $ref: "#/components/schemas/task_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
+      responses:
+        "201":
+          description: "タスクの作成に成功しました。"
+    put:
+      summary: "タスクの更新をします"
+      description: "タスクの更新をします。task_idは自動で割り振られます。"
+      deprecated: false
+      parameters:
+        - name: task_id
+          in: path
+          description: 更新対象のタスクID
+          required: true
+          schema:
+            $ref: "#/components/schemas/task_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
+      responses:
+        "200":
+          description: "タスクの更新に成功しました。"
+    delete:
+      summary: "タスクの削除をします"
+      description: "タスクの削除をします。task_idは自動で割り振られます。"
+      deprecated: false
+      parameters:
+        - name: task_id
+          in: path
+          description: 削除対象のタスクID
+          required: true
+          schema:
+            $ref: "#/components/schemas/task_id"
+      responses:
+        "200":
+          description: "タスクの削除に成功しました。"
+
+components:
+  schemas:
+    task_id:
+      description: タスクの識別子
+      type: integer
+      minimum: 1
+      exclusiveMinimum: false
+      example: 1
+    task:
+      description: タスク
+      type: object
+      properties:
+        task_id:
+          $ref: "#/components/schemas/task_id"
+        task_name:
+          description: タスク名
+          type: string
+          nullable: false
+          maxLength: 127
+          example: study open api
+        completed:
+          description: タスクが完了したかどうか
+          type: boolean
+          default: false
+      required:
+        - task_name
