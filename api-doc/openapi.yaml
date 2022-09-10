@@ -127,6 +127,13 @@ components:
       properties:
         task_id:
           $ref: "#/components/schemas/task_id"
+        user_id:
+          description: ユーザーの識別子
+          type: integer
+          nullable: false
+          minimum: 1
+          exclusiveMinimum: false
+          example: 1
         task_name:
           description: タスク名
           type: string
@@ -140,6 +147,7 @@ components:
           default: false
       required:
         - task_id
+        - user_id
         - task_name
     error:
       type: object
