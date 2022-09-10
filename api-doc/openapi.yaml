@@ -16,23 +16,25 @@ servers:
         default: "4000"
 
 paths:
-  "/api/completes/tasks":
+  "/api/tasks/{task_id}":
     get:
-      summary: "完了しているタスクを取得します"
-      description: "完了しているタスクを取得します。"
+      summary: "タスクを取得します"
+      description: "タスクを取得します。"
       deprecated: false
-      responses:
-        "200":
-          description: "完了しているタスクの取得に成功しました。"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/task"
-  "/api/incompletes/tasks":
-    get:
-      summary: "完了していないタスクを取得します"
-      description: "完了していないタスクを取得します。"
-      deprecated: false
+      parameters:
+        - name: task_id
+          in: path
+          description: 追加対象のタスクID
+          required: true
+          schema:
+            $ref: "#/components/schemas/task_id"
+        - name: active
+          in: query
+          description: activeがtrueの場合は完了していないタスクを取得し、falseの場合は完了しているタスクを取得する
+          required: true
+          schema:
+            type: boolean
+            default: false
       responses:
         "200":
           description: "完了していないタスクの取得に成功しました。"
@@ -40,7 +42,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/task"
-  "/api/tasks/{task_id}":
+        "404":
+          $ref: "#/components/responses/NotFound"
     post:
       summary: "タスクの追加をします"
       description: "タスクの追加をします。task_idは自動で割り振られます。"
@@ -61,7 +64,9 @@ paths:
       responses:
         "201":
           description: "タスクの作成に成功しました。"
-    put:
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
       summary: "タスクの更新をします"
       description: "タスクの更新をします。task_idは自動で割り振られます。"
       deprecated: false
@@ -81,6 +86,8 @@ paths:
       responses:
         "200":
           description: "タスクの更新に成功しました。"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       summary: "タスクの削除をします"
       description: "タスクの削除をします。task_idは自動で割り振られます。"
@@ -93,14 +100,24 @@ paths:
           schema:
             $ref: "#/components/schemas/task_id"
       responses:
-        "200":
+        "204":
           description: "タスクの削除に成功しました。"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
 components:
+  responses:
+    NotFound:
+      description: "タスクIDが存在しません。"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
   schemas:
     task_id:
       description: タスクの識別子
       type: integer
+      nullable: false
       minimum: 1
       exclusiveMinimum: false
       example: 1
@@ -116,9 +133,21 @@ components:
           nullable: false
           maxLength: 127
           example: study open api
-        completed:
+        done:
           description: タスクが完了したかどうか
           type: boolean
+          nullable: false
           default: false
       required:
+        - task_id
         - task_name
+    error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
