@@ -28,9 +28,9 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/task_id"
-        - name: active
+        - name: done
           in: query
-          description: activeがtrueの場合は完了していないタスクを取得し、falseの場合は完了しているタスクを取得する
+          description: doneがtrueの場合は完了していないタスクを取得し、falseの場合は完了しているタスクを取得する
           required: true
           schema:
             type: boolean
@@ -149,6 +149,7 @@ components:
         - task_id
         - user_id
         - task_name
+        - done
     error:
       type: object
       properties:
