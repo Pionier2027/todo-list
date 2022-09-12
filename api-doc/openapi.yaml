@@ -18,26 +18,26 @@ servers:
 paths:
   "/api/tasks/{task_id}":
     get:
-      summary: "タスクを取得します"
-      description: "タスクを取得します。"
+      summary: "指定したタスクIDのタスクを取得します"
+      description: "指定したタスクIDのタスクを取得します。"
       deprecated: false
-      parameters:
-        - name: task_id
-          in: path
-          description: 追加対象のタスクID
-          required: true
-          schema:
-            $ref: "#/components/schemas/task_id"
-        - name: done
-          in: query
-          description: doneがtrueの場合は完了していないタスクを取得し、falseの場合は完了しているタスクを取得する
-          required: true
-          schema:
-            type: boolean
-            default: false
       responses:
         "200":
-          description: "完了していないタスクの取得に成功しました。"
+          description: "タスクの取得に成功しました。"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  "/api/tasks":
+    get:
+      summary: "すべてのタスクを取得します"
+      description: "すべてのタスクを取得します。"
+      deprecated: false
+      responses:
+        "200":
+          description: "タスクの取得に成功しました。"
           content:
             application/json:
               schema:
@@ -48,13 +48,6 @@ paths:
       summary: "タスクの追加をします"
       description: "タスクの追加をします。task_idは自動で割り振られます。"
       deprecated: false
-      parameters:
-        - name: task_id
-          in: path
-          description: 追加対象のタスクID
-          required: true
-          schema:
-            $ref: "#/components/schemas/task_id"
       requestBody:
         required: true
         content:
@@ -70,13 +63,6 @@ paths:
       summary: "タスクの更新をします"
       description: "タスクの更新をします。task_idは自動で割り振られます。"
       deprecated: false
-      parameters:
-        - name: task_id
-          in: path
-          description: 更新対象のタスクID
-          required: true
-          schema:
-            $ref: "#/components/schemas/task_id"
       requestBody:
         required: true
         content:
