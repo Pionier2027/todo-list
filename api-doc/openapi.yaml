@@ -30,6 +30,8 @@ paths:
                 $ref: "#/components/schemas/task"
         "404":
           $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   "/api/tasks":
     get:
       summary: "すべてのタスクを取得します"
@@ -42,8 +44,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/task"
-        "404":
-          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     post:
       summary: "タスクの追加をします"
       description: "タスクの追加をします。task_idは自動で割り振られます。"
@@ -57,8 +59,12 @@ paths:
       responses:
         "201":
           description: "タスクの作成に成功しました。"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     patch:
       summary: "タスクの更新をします"
       description: "タスクの更新をします。task_idは自動で割り振られます。"
@@ -72,29 +78,48 @@ paths:
       responses:
         "200":
           description: "タスクの更新に成功しました。"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     delete:
       summary: "タスクの削除をします"
       description: "タスクの削除をします。task_idは自動で割り振られます。"
       deprecated: false
-      parameters:
-        - name: task_id
-          in: path
-          description: 削除対象のタスクID
-          required: true
-          schema:
-            $ref: "#/components/schemas/task_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
       responses:
         "204":
           description: "タスクの削除に成功しました。"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
 components:
   responses:
     NotFound:
       description: "タスクIDが存在しません。"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+    BadRequest:
+      description: "不正なリクエストパラメータです。"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+    InternalServerError:
+      description: "サーバーサイドのアプリケーションでエラーが発生しました。"
       content:
         application/json:
           schema:
