@@ -1,0 +1,193 @@
+openapi: "3.0.0"
+
+info:
+  title: "TODOリスト API"
+  license:
+    name: "MIT License"
+    url: "https://opensource.org/licenses/MIT"
+  version: "1.0.0"
+
+servers:
+  - url: "http://localhost:{port}"
+    description: "ローカルの開発環境"
+    variables:
+      port:
+        enum: ["4000"]
+        default: "4000"
+
+paths:
+  "/api/user/login":
+    post:
+      summary: "ログイン認証をします"
+      description: "ログイン認証をします。"
+      deprecated: false
+      responses:
+        "200":
+          description: "ログインに成功しました。"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
+  "/api/tasks/{task_id}":
+    get:
+      summary: "指定したタスクIDのタスクを取得します"
+      description: "指定したタスクIDのタスクを取得します。"
+      deprecated: false
+      responses:
+        "200":
+          description: "タスクの取得に成功しました。"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  "/api/tasks":
+    get:
+      summary: "すべてのタスクを取得します"
+      description: "すべてのタスクを取得します。"
+      deprecated: false
+      responses:
+        "200":
+          description: "タスクの取得に成功しました。"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    post:
+      summary: "タスクの追加をします"
+      description: "タスクの追加をします。task_idは自動で割り振られます。"
+      deprecated: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
+      responses:
+        "201":
+          description: "タスクの作成に成功しました。"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    patch:
+      summary: "タスクの更新をします"
+      description: "タスクの更新をします。task_idは自動で割り振られます。"
+      deprecated: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
+      responses:
+        "200":
+          description: "タスクの更新に成功しました。"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    delete:
+      summary: "タスクの削除をします"
+      description: "タスクの削除をします。task_idは自動で割り振られます。"
+      deprecated: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
+      responses:
+        "204":
+          description: "タスクの削除に成功しました。"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: "JWTを使用した認証。"
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: "不正なリクエストパラメータです。"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+    UnauthorizedError:
+      description: "アクセストークンがないか無効です。"
+    NotFound:
+      description: "タスクIDが存在しません。"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+    InternalServerError:
+      description: "サーバーサイドのアプリケーションでエラーが発生しました。"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+  schemas:
+    task_id:
+      description: タスクの識別子
+      type: integer
+      nullable: false
+      minimum: 1
+      exclusiveMinimum: false
+      example: 1
+    task:
+      description: タスク
+      type: object
+      properties:
+        task_id:
+          $ref: "#/components/schemas/task_id"
+        user_id:
+          description: ユーザーの識別子
+          type: string
+          format: uuid
+          minimum: 1
+          exclusiveMinimum: false
+          example: 1
+        task_name:
+          description: タスク名
+          type: string
+          nullable: false
+          maxLength: 127
+          example: study open api
+        done:
+          description: タスクが完了したかどうか
+          type: boolean
+          nullable: false
+          default: false
+      required:
+        - task_id
+        - user_id
+        - task_name
+        - done
+    error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
