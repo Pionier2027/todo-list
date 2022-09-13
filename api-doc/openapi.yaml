@@ -16,6 +16,18 @@ servers:
         default: "4000"
 
 paths:
+  "/api/user/login":
+    post:
+      summary: "ログイン認証をします"
+      description: "ログイン認証をします。"
+      deprecated: false
+      responses:
+        "200":
+          description: "ログインに成功しました。"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: []
   "/api/tasks/{task_id}":
     get:
       summary: "指定したタスクIDのタスクを取得します"
@@ -105,15 +117,23 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: "JWTを使用した認証。"
+      scheme: bearer
+      bearerFormat: JWT
   responses:
-    NotFound:
-      description: "タスクIDが存在しません。"
+    BadRequest:
+      description: "不正なリクエストパラメータです。"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/error"
-    BadRequest:
-      description: "不正なリクエストパラメータです。"
+    UnauthorizedError:
+      description: "アクセストークンがないか無効です。"
+    NotFound:
+      description: "タスクIDが存在しません。"
       content:
         application/json:
           schema:
@@ -140,8 +160,8 @@ components:
           $ref: "#/components/schemas/task_id"
         user_id:
           description: ユーザーの識別子
-          type: integer
-          nullable: false
+          type: string
+          format: uuid
           minimum: 1
           exclusiveMinimum: false
           example: 1
